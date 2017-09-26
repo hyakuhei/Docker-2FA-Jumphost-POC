@@ -144,3 +144,10 @@ Subsystem	sftp	/usr/lib/ssh/sftp-server
 #RSAAuthentication yes
 #PubkeyAuthentication yes
 #PasswordAuthentication no
+
+HostCertificate /etc/ssh/ssh_host_rsa_key-cert.pub
+TrustedUserCAKeys /etc/ssh/user_ca.pub
+#PubkeyAuthentication yes
+#ChallengeResponseAuthentication no
+#PasswordAuthentication no
+#UsePAM yes
