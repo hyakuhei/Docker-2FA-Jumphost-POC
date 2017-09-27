@@ -9,12 +9,13 @@ For my imaginary scenario, I have a jump box positioned between my client and th
 ----------      -----------      ----------
 | client | ---> | jumpbox | ---> | server |
 ----------      -----------      ----------
-      pubkey + 2fa        password
+      pubkey + 2fa        ssh certificate
 ```
+The client authenticates with the JumpBox using their SSH public key and Google Authenticator. The jumpbox is pre-configured with a SSH certificate that provides access onwards to the server for that specific user.
 
 This repository contains two folders, each has dockerfiles for building containers, scripts to run on container invocation etc.
 
-## JumpBox-2FA
+## JumpAuth
 The eventual idea here is that you might want to have jumpboxes that spawn sessions for users to connect via, which is why this jumpbox creates a lot of things when it starts up.
 
 What I think is interesting is the way it also dynamically provisions 2FA services for Google Authenticator.
@@ -23,32 +24,27 @@ What I think is interesting is the way it also dynamically provisions 2FA servic
 This one's pretty simple, a small Alpine container that's just intended as an SSH endpoint in order for the jumpbox to have something to forward connections onto.
 
 ## Getting started
-- Clone this repository
-- From within the repository folder
-- Create a ssh keypair to use for your user
-  - ```sshkeygen -f ./id_rsa```
+Create (or provide) the keys that our 'client' will use along with
 
-## Getting started | JumpBox
-- Build the container
-```
-cd JumpBox-2FA
-docker build -t 2fajumpbox .
-```
-- Run the container, providing username and public ssh key
-```
-docker run -d -p 1122:22 \
--e USER=op9 \
--e SSH_PUBKEY="$(cat ../id_rsa.pub)"
-2fajumpbox
-```
 - The container will start, it will run a local copy of the ```run.sh``` script which creates a user in this case called 'op9', imports a pubkey for that user and configures google authenticator
 - Get the logs from the container and use them to access the OTP code for the container
 
-## Getting started | Server
-Build the server container and start it as described above for the 2fa jumpbox
-- Get the password for the user from the docker logs for that container
+## Quickstart
+```
+git clone git@github.com:hyakuhei/Docker-2FA-Jumphost-POC.git
+cd Docker-2FA-Jumphost-POC
+sh create_keys.sh
+cd Server
+sh bootstrap_server.sh
+cd ../JumpAuth
+sh bootstrap_jumpauth.sh
+cd ..
 
-At this point you should be able to connect to the 2fa box using pubkey and 2fa, and to the server using password.
+#Two containers are now running, a "server" we want to reach and a "Jumpbox" that is configured to allow forward access to that server.
+
+#To connect to the server, via the jumpbox run:
+ssh -A -t -p 1122 -i ./id_rsa -l op9 127.0.0.1 ssh -A test.server.example.com
+```
 
 ## Example video
 [![Video of operation](https://img.youtube.com/vi/m3JFaFzrevM/0.jpg)](https://www.youtube.com/watch?v=m3JFaFzrevM)
