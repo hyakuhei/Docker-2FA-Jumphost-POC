@@ -2,18 +2,18 @@
 As I was playing around with some things in the IBM bluemix environment I started wondering about using ephemeral container jump-hosts to pivot into cloud environments. As a proof of concept toy, I wanted to experiment with how one might use Docker to spawn jump-hosts that could be used to log into other hosts.
 
 Using containers as ephemeral bastion hosts has some really interesting properties:
-* Ephemerality: if operators try to drop ssh keys, access tokens, tools etc on the jump box, they're magically deleted once they loose access.
-* Scalability: the process for scaling this sort of access is trivial.
-* Security: Containers use all the fun technologies that we would use to try to stop a shell doing bad things on a bastion hosts (i.e MAC, SECCOMP, Namespaces, CGroups, etc) however using docker buys us extremely useful lifecycle management and introspection capabilities.
+* **Ephemerality**: if operators try to drop ssh keys, access tokens, tools etc on the jump box, they're magically deleted once they loose access.
+* **Scalability**: the process for scaling this sort of access is trivial.
+* **Security**: Containers use all the fun technologies that we would use to try to stop a shell doing bad things on a bastion hosts (i.e MAC, SECCOMP, Namespaces, CGroups, etc) however using docker buys us extremely useful lifecycle management and introspection capabilities.
 
 For this POC the Jumpbox uses SSH Certificates to manage access to back-end infrastructure. This again has some useful properties over a more traditional ssh-key (eurgh!) or password (just nasty!) approach:
-* Limit access time: No need to worry about how long a user has the certificate for or how it might need to be protected in the longer term - ssh certificates have expiries! I can issue a user with a certificate valid for an hour - that's the default here.
-* Key distribution: Got a team of 30 operators who need access to 10000 machines? Do operators change frequently? No problem with certificates, much like with the more hierarchical X.509 certificate system, simply distribute a signing certificate (like a CA) for your operators onto all machines. That's one thing to manage and update and it can be done centrally. No need to manage indipendant users.
-* Host identitfication: Operators will regularly log into systems they've never accessed before - when they do they'll get that UNKOWN HOST warning! Do you know what (almost) every operator in the world does, they say "That's ok, I've not been here before, I'll accept" - with SSH certificates you can perform host identification. Now Operators (and the Jump-Containers) don't need to know about every one of the 10000 machines, they only need to trust one CA - WOW!
+* **Limit access time**: No need to worry about how long a user has the certificate for or how it might need to be protected in the longer term - ssh certificates have expiries! I can issue a user with a certificate valid for an hour - that's the default here.
+* **Key distribution**: Got a team of 30 operators who need access to 10000 machines? Do operators change frequently? No problem with certificates, much like with the more hierarchical X.509 certificate system, simply distribute a signing certificate (like a CA) for your operators onto all machines. That's one thing to manage and update and it can be done centrally. No need to manage indipendant users.
+* **Host identitfication**: Operators will regularly log into systems they've never accessed before - when they do they'll get that UNKOWN HOST warning! Do you know what (almost) every operator in the world does, they say "That's ok, I've not been here before, I'll accept" - with SSH certificates you can perform host identification. Now Operators (and the Jump-Containers) don't need to know about every one of the 10000 machines, they only need to trust one CA - WOW!
 
 This project also dynamically provisions Google Authenticator 2FA into each ephemeral jump host, the idea here was really just to play with dynamic 2FA and to explore how it might be used in these sorts of scenarios. It works really well!
 
-Note: If you're trying to solve a gated access issue you're better off looking at technologies like [ssh keybox](https://github.com/skavanagh/KeyBox),   [teleport](https://gravitational.com/teleport/) or [thycotic](https://thycotic.com/)
+**Note**: If you're trying to solve a gated access issue you're better off looking at technologies like [ssh keybox](https://github.com/skavanagh/KeyBox),   [teleport](https://gravitational.com/teleport/) or [thycotic](https://thycotic.com/)
 
 For my imaginary scenario, I have a jump box positioned between my client and the servers that I want to modify. You dear reader play the part of the provsioning/authorization system. When running the commands and exploring the stuff that I've scratched together to orchestrate the containers keep in mind that these would likely be performed by an auth system. The normal flow being that an operator would:
 * Go to the authorization portal and provide business need (pager duty / jira ticket / audio recording of screaming customer) for audit purposes.
