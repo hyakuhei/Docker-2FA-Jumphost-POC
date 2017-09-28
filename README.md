@@ -73,6 +73,9 @@ cd ..
 
 #To connect to the server, via the jumpbox run:
 ssh -A -t -p 1122 -i ./id_rsa -l op9 127.0.0.1 ssh -A test.server.example.com
+
+#The user will be challenged for a 2FA credential, to get the Google Authenticator barcode run the script below and paste the url into a web browser:
+docker logs $(docker ps | grep 'jumpauth' | awk '{ print $1 }') | grep https
 ```
 
 ## Example video
