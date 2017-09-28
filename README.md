@@ -1,4 +1,4 @@
-# Fulcrum - a system for creating conterized pivots (jump hosts) into secure environments
+# Fulcrum - a system for creating conterized pivots into secure environments
 As I was playing around with some things in the IBM bluemix environment I started wondering about using ephemeral container jump-hosts to pivot into cloud environments. As a proof of concept toy, I wanted to experiment with how one might use Docker to spawn jump-hosts that could be used to log into other hosts.
 
 Using containers as ephemeral bastion hosts has some really interesting properties:
